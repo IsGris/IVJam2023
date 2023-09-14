@@ -16,6 +16,8 @@ public class FillTiles : MonoBehaviour
 
 		Assert.IsNotNull(Tilemap);
 		Assert.IsNotNull(Tile);
+
+		this.Fill();
 	}
 
 	public void Fill()
@@ -23,13 +25,18 @@ public class FillTiles : MonoBehaviour
 		Fill(StartPos, EndPos);
 	}
 
-	public void Fill(in Vector2 StartPos, in Vector2 EndPos)
+	public void Fill(in Vector2Int StartPos, in Vector2Int EndPos)
 	{
-		for (int i = (int)StartPos.x; i != EndPos.x + (StartPos.x < EndPos.x ? 1 : -1); i += (StartPos.x < EndPos.x ? 1 : -1))
+		int minX = Mathf.Min(StartPos.x, EndPos.x);
+		int maxX = Mathf.Max(StartPos.x, EndPos.x);
+		int minY = Mathf.Min(StartPos.y, EndPos.y);
+		int maxY = Mathf.Max(StartPos.y, EndPos.y);
+
+		for (int x = minX; x <= maxX; x++)
 		{
-			for (int k = (int)StartPos.y; k != EndPos.x + (StartPos.y < EndPos.y ? 1 : -1); k += (StartPos.y < EndPos.y ? 1 : -1))
+			for (int y = minY; y <= maxY; y++)
 			{
-				this.Tilemap.SetTile(new Vector3Int(i, k, 0), this.Tile);
+				this.Tilemap.SetTile(new Vector3Int(x, y, 0), this.Tile);
 			}
 		}
 	}
