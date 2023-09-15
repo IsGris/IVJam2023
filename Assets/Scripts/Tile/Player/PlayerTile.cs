@@ -18,16 +18,18 @@ public class PlayerTile : Tile
 	[NonSerialized] public static PlayerTile instance;
 	
 	[NonSerialized] public ChessPiece ChessPiece;
-	public Statistics Statistics;
+	public PlayerStatistics Statistics;
 	public Vector2Int Location;
+	public static bool IsMoving = false;
 
 	public override bool StartUp(Vector3Int location, ITilemap tilemap, GameObject go)
 	{
-		ChessPiece = (ChessPiece)UnityEngine.Random.Range(0, System.Enum.GetValues(typeof(ChessPiece)).Length);
+		if (!IsMoving)
+		{
+			ChessPiece = (ChessPiece)UnityEngine.Random.Range(0, System.Enum.GetValues(typeof(ChessPiece)).Length);
+		}
 		instance = this;
 		Location = new Vector2Int(location.x, location.y);
 		return true;
 	}
-
-
 }

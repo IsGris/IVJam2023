@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.Assertions;
+using System.Collections.Generic;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -13,8 +14,8 @@ public class PlayerMovement : MonoBehaviour
 
 	[SerializeField] private Vector2Int StartBoardPos;
 	[SerializeField] private Vector2Int EndBoardPos;
-	
-	private bool IsMoving = false;
+
+	private bool IsHighlighting = false;
 
 	private void Start()
 	{
@@ -26,24 +27,151 @@ public class PlayerMovement : MonoBehaviour
 	}
 
 	void Update()
-    {
+	{
 		if (Input.GetMouseButtonDown(0))
 		{
 			Vector3Int ClickPosition = BoardTileMap.WorldToCell(Camera.main.ScreenToWorldPoint(Input.mousePosition));
-			TileBase clickedTile = BoardTileMap.GetTile(ClickPosition);
+			TileBase ClickedTile = BoardTileMap.GetTile(ClickPosition);
 
-			if (clickedTile == null && !IsMoving)
+			if (ClickedTile == null && !IsHighlighting)
 				return;
-			else if (IsMoving)
-			{
 
+
+			if (IsHighlighting)
+			{
+				if (IsAvialibleToMove(PlayerTile.instance.Location, new Vector2Int(ClickPosition.x, ClickPosition.y), PlayerTile.instance.ChessPiece))
+					MovePlayer(new Vector2Int(ClickPosition.x, ClickPosition.y));
 			}
-			else if (clickedTile is PlayerTile)
+			else if (ClickedTile is PlayerTile)
 			{
 				HighlightCellsToMove(PlayerTile.instance.ChessPiece);
-				IsMoving = true;
+				IsHighlighting = true;
 			}
 		}
+	}
+
+	private void MovePlayer(in Vector2Int EndPosition)
+	{
+		PlayerTile.IsMoving = true;
+		Vector2Int StartLocation = PlayerTile.instance.Location;
+		BoardTileMap.SetTile(new Vector3Int(EndPosition.x, EndPosition.y, 0), PlayerTile.instance);
+		BoardTileMap.SetTile(new Vector3Int(StartLocation.x, StartLocation.y, 0), null);
+		HighlightMovesTileMap.ClearAllTiles();
+		IsHighlighting = false;
+		PlayerTile.IsMoving = false;
+	}
+
+	private bool IsAvialibleToMove(in Vector2Int StartPosition, in Vector2Int EndPosition, in ChessPiece MovingChessPiece)
+	{
+		List<Vector2Int> AvialiblePosition = new List<Vector2Int>();
+
+		switch (MovingChessPiece)
+		{
+			case ChessPiece.Pawn:
+				{
+					TileBase ForwardTile = BoardTileMap.GetTile(new Vector3Int(StartPosition.x, StartPosition.y + 1, 0));
+					TileBase ForwardLeftTile = BoardTileMap.GetTile(new Vector3Int(StartPosition.x - 1, StartPosition.y + 1, 0));
+					TileBase ForwardRightTile = BoardTileMap.GetTile(new Vector3Int(StartPosition.x + 1, StartPosition.y + 1, 0));
+
+					if (!IsEmptyTile(ForwardTile) && (IsEmptyTile(ForwardLeftTile) && IsEmptyTile(ForwardRightTile))) // can attack forward if moving is blocked
+					{
+						AvialiblePosition.Add(new Vector2Int(StartPosition.x, StartPosition.y + 1));
+					}
+					else
+					{
+						if (IsEmptyTile(ForwardTile))
+							AvialiblePosition.Add(new Vector2Int(StartPosition.x, StartPosition.y + 1));
+						if (IsEnemyTile(ForwardLeftTile))
+							AvialiblePosition.Add(new Vector2Int(StartPosition.x - 1, StartPosition.y + 1));
+						if (IsEnemyTile(ForwardRightTile))
+							AvialiblePosition.Add(new Vector2Int(StartPosition.x + 1, StartPosition.y + 1));
+					}
+				}
+				break;
+			case ChessPiece.Knight:
+				{
+					AvialiblePosition.Add(new Vector2Int(StartPosition.x - 1, StartPosition.y + 2));
+					AvialiblePosition.Add(new Vector2Int(StartPosition.x + 1, StartPosition.y + 2));
+					AvialiblePosition.Add(new Vector2Int(StartPosition.x - 2, StartPosition.y + 1));
+					AvialiblePosition.Add(new Vector2Int(StartPosition.x + 2, StartPosition.y + 1));
+				}
+				break;
+			case ChessPiece.Bishop:
+				{
+					for (int IsLeft = 0; IsLeft < 2; IsLeft++)
+					{
+						for (int i = 1; i <= Mathf.Max(StartBoardPos.x, EndBoardPos.x) - Mathf.Min(StartBoardPos.x, EndBoardPos.x); i++)
+						{
+							AvialiblePosition.Add(new Vector2Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y + i));
+							if (IsEnemyTile(BoardTileMap.GetTile(new Vector3Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y + i, 0))))
+								break;
+						}
+					}
+				}
+				break;
+			case ChessPiece.Rook:
+				{
+					for (int IsLeft = 0; IsLeft < 2; IsLeft++)
+					{
+						for (int i = 1; i <= Mathf.Max(StartBoardPos.x, EndBoardPos.x) - Mathf.Min(StartBoardPos.x, EndBoardPos.x); i++)
+						{
+							AvialiblePosition.Add(new Vector2Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y));
+							if (IsEnemyTile(BoardTileMap.GetTile(new Vector3Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y, 0))))
+								break;
+						}
+					}
+					for (int i = 1; i <= Mathf.Max(StartBoardPos.y, EndBoardPos.y) - Mathf.Min(StartBoardPos.y, EndBoardPos.y); i++)
+					{
+						AvialiblePosition.Add(new Vector2Int(StartPosition.x, StartPosition.y + i));
+						if (IsEnemyTile(BoardTileMap.GetTile(new Vector3Int(StartPosition.x, StartPosition.y + i, 0))))
+							break;
+					}
+				}
+				break;
+			case ChessPiece.Queen:
+				{
+					for (int IsLeft = 0; IsLeft < 2; IsLeft++)
+					{
+						for (int i = 1; i <= Mathf.Max(StartBoardPos.x, EndBoardPos.x) - Mathf.Min(StartBoardPos.x, EndBoardPos.x); i++)
+						{
+							AvialiblePosition.Add(new Vector2Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y + i));
+							if (IsEnemyTile(BoardTileMap.GetTile(new Vector3Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y + i, 0))))
+								break;
+						}
+					}
+					for (int IsLeft = 0; IsLeft < 2; IsLeft++)
+					{
+						for (int i = 1; i <= Mathf.Max(StartBoardPos.x, EndBoardPos.x) - Mathf.Min(StartBoardPos.x, EndBoardPos.x); i++)
+						{
+							AvialiblePosition.Add(new Vector2Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y));
+							if (IsEnemyTile(BoardTileMap.GetTile(new Vector3Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y, 0))))
+								break;
+						}
+					}
+					for (int i = 1; i <= Mathf.Max(StartBoardPos.y, EndBoardPos.y) - Mathf.Min(StartBoardPos.y, EndBoardPos.y); i++)
+					{
+						AvialiblePosition.Add(new Vector2Int(StartPosition.x, StartPosition.y + i));
+						if (IsEnemyTile(BoardTileMap.GetTile(new Vector3Int(StartPosition.x, StartPosition.y + i, 0))))
+							break;
+					}
+				}
+				break;
+			case ChessPiece.King:
+				{
+
+					AvialiblePosition.Add(new Vector2Int(StartPosition.x, StartPosition.y + 1));
+					AvialiblePosition.Add(new Vector2Int(StartPosition.x + 1, StartPosition.y + 1));
+					AvialiblePosition.Add(new Vector2Int(StartPosition.x - 1, StartPosition.y + 1));
+					AvialiblePosition.Add(new Vector2Int(StartPosition.x - 1, StartPosition.y));
+					AvialiblePosition.Add(new Vector2Int(StartPosition.x + 1, StartPosition.y));
+				}
+				break;
+		}
+
+		if (AvialiblePosition.Contains(EndPosition))
+			return true;
+		else
+			return false;
 	}
 
 	private void HighlightCellsToMove(in ChessPiece MovingChessPiece)
@@ -180,6 +308,7 @@ public class PlayerMovement : MonoBehaviour
 				break;
 		}
 	}
+	
 	private bool IsBenefitTile(in TileBase tile)
 	{
 		if (tile is BenefitTile)
