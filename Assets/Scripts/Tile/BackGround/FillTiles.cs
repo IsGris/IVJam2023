@@ -11,6 +11,7 @@ public class FillTiles : MonoBehaviour
 
 	void Start()
     {
+		// inits
 		if (Tilemap == null)
 			Tilemap = GetComponent<Tilemap>();
 
@@ -20,11 +21,13 @@ public class FillTiles : MonoBehaviour
 		this.Fill();
 	}
 
+	// fill all from StartPos to EndPos using Tile in Tilemap from class
 	public void Fill()
 	{
 		Fill(StartPos, EndPos);
 	}
 
+	// fill all from StartPos to EndPos using Tile in Tilemap from class
 	public void Fill(in Vector2Int StartPos, in Vector2Int EndPos)
 	{
 		int minX = Mathf.Min(StartPos.x, EndPos.x);
@@ -32,7 +35,7 @@ public class FillTiles : MonoBehaviour
 		int minY = Mathf.Min(StartPos.y, EndPos.y);
 		int maxY = Mathf.Max(StartPos.y, EndPos.y);
 
-		for (int x = minX; x <= maxX; x++)
+		for (int x = minX; x <= maxX; x++) // iterate through each cell and set it to tile
 		{
 			for (int y = minY; y <= maxY; y++)
 			{
