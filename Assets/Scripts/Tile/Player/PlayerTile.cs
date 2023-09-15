@@ -28,6 +28,8 @@ public class PlayerTile : Tile
 		{
 			ChessPiece = (ChessPiece)UnityEngine.Random.Range(0, System.Enum.GetValues(typeof(ChessPiece)).Length);
 		}
+		if (Statistics == null)
+			Statistics = CreateInstance<PlayerStatistics>();
 		instance = this;
 		Location = new Vector2Int(location.x, location.y);
 		return true;

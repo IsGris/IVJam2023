@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fcd0d71137999454cba014cd60cf1895, type: 3}
-  m_Name: New Player Tile
+  m_Name: PlayerTile
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: -9095717837082945937, guid: 41b16d24db92a894e94b0af03716e61e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1
@@ -35,3 +35,4 @@ MonoBehaviour:
   m_Flags: 1
   m_ColliderType: 1
   Statistics: {fileID: 0}
+  Location: {x: 1, y: 0}

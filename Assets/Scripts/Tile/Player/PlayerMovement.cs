@@ -36,11 +36,19 @@ public class PlayerMovement : MonoBehaviour
 			if (ClickedTile == null && !IsHighlighting)
 				return;
 
-
 			if (IsHighlighting)
 			{
 				if (IsAvialibleToMove(PlayerTile.instance.Location, new Vector2Int(ClickPosition.x, ClickPosition.y), PlayerTile.instance.ChessPiece))
+				{
+					TryGetBenefit(new Vector2Int(ClickPosition.x, ClickPosition.y));
 					MovePlayer(new Vector2Int(ClickPosition.x, ClickPosition.y));
+					HighlightMovesTileMap.ClearAllTiles();
+					IsHighlighting = false;
+				} else
+				{
+					HighlightMovesTileMap.ClearAllTiles();
+					IsHighlighting = false;
+				}
 			}
 			else if (ClickedTile is PlayerTile)
 			{
@@ -56,13 +64,35 @@ public class PlayerMovement : MonoBehaviour
 		Vector2Int StartLocation = PlayerTile.instance.Location;
 		BoardTileMap.SetTile(new Vector3Int(EndPosition.x, EndPosition.y, 0), PlayerTile.instance);
 		BoardTileMap.SetTile(new Vector3Int(StartLocation.x, StartLocation.y, 0), null);
-		HighlightMovesTileMap.ClearAllTiles();
-		IsHighlighting = false;
 		PlayerTile.IsMoving = false;
 	}
 
+	private void TryGetBenefit(in Vector2Int BenefitPosition)
+	{
+        if ( IsBenefitTile(BoardTileMap.GetTile(new Vector3Int(BenefitPosition.x, BenefitPosition.y, 0))) )
+        {
+			BenefitTile tile = BoardTileMap.GetTile(new Vector3Int(BenefitPosition.x, BenefitPosition.y, 0)) as BenefitTile;
+			switch (tile.Type) 
+			{
+				case BenefitTile.BenefitType.Attack:
+					PlayerTile.instance.Statistics.Attack += tile.Amount;
+					break;
+				case BenefitTile.BenefitType.Health:
+					PlayerTile.instance.Statistics.Health += tile.Amount;
+					break;
+				case BenefitTile.BenefitType.Armor:
+					PlayerTile.instance.Statistics.Armor += tile.Amount;
+					break;
+			}
+			BoardTileMap.SetTile(new Vector3Int(BenefitPosition.x, BenefitPosition.y, 0), null);
+        }
+    }
+
 	private bool IsAvialibleToMove(in Vector2Int StartPosition, in Vector2Int EndPosition, in ChessPiece MovingChessPiece)
 	{
+		if (EndPosition.y > StartBoardPos.y || EndPosition.x < StartBoardPos.x || EndPosition.x > EndBoardPos.x)
+			return false;
+
 		List<Vector2Int> AvialiblePosition = new List<Vector2Int>();
 
 		switch (MovingChessPiece)
