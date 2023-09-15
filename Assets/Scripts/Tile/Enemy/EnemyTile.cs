@@ -6,7 +6,7 @@ using UnityEngine.Tilemaps;
 public class EnemyTile : Tile
 {
 	[NonSerialized] public ChessPiece ChessPiece;
-	[NonSerialized] public Statistics Statistics;
+	[NonSerialized] public EnemyStatistics Statistics;
 
 	public override bool StartUp(Vector3Int location, ITilemap tilemap, GameObject go)
 	{
