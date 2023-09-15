@@ -1,10 +1,12 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.Assertions;
+using static ChessUtilities;
 using System.Collections.Generic;
 
 public class PlayerMovement : MonoBehaviour
 {
+	public static PlayerMovement instance;
 	[SerializeField] private Tilemap BoardTileMap = null;
 	[SerializeField] private Tilemap HighlightMovesTileMap = null;
 
@@ -17,18 +19,20 @@ public class PlayerMovement : MonoBehaviour
 
 	private bool IsHighlighting = false;
 
-	private void Start()
+	private void Awake()
 	{
 		Assert.IsNotNull(BoardTileMap);
 		Assert.IsNotNull(HighlightMovesTileMap);
 		Assert.IsNotNull(EquipHighlightTile);
 		Assert.IsNotNull(EmptyHighlightTile);
 		Assert.IsNotNull(AttackHighlightTile);
+		instance = this;
+		ChessUtilities.Init(BoardTileMap, StartBoardPos, EndBoardPos, EquipHighlightTile, EmptyHighlightTile, AttackHighlightTile);
 	}
 
 	void Update()
 	{
-		if (Input.GetMouseButtonDown(0))
+		if (Input.GetMouseButtonDown(0) && !PlayerTile.instance.IsFighting)
 		{
 			Vector3Int ClickPosition = BoardTileMap.WorldToCell(Camera.main.ScreenToWorldPoint(Input.mousePosition));
 			TileBase ClickedTile = BoardTileMap.GetTile(ClickPosition);
@@ -44,6 +48,23 @@ public class PlayerMovement : MonoBehaviour
 					MovePlayer(new Vector2Int(ClickPosition.x, ClickPosition.y));
 					HighlightMovesTileMap.ClearAllTiles();
 					IsHighlighting = false;
+					List<EnemyTile> AllFightingTiles = new List<EnemyTile>();
+
+					bool IsPlayerAttackFirst = false;
+					if (IsEnemyTile(ClickedTile))
+					{
+						IsPlayerAttackFirst = true;
+						AllFightingTiles.Add(ClickedTile as EnemyTile);
+					}
+					AllFightingTiles.AddRange(GetAllEnemiesThatCanAttackTile(PlayerTile.instance.Location));
+
+					if (AllFightingTiles.Count > 0)
+					{
+						PlayerTile.instance.IsFighting = true;
+						EnemyTile FirstEnemy = AllFightingTiles[0];
+						AllFightingTiles.RemoveAt(0);
+						StartCoroutine(PlayerTile.instance.StartAttack(IsPlayerAttackFirst, FirstEnemy, AllFightingTiles));
+					}
 				} else
 				{
 					HighlightMovesTileMap.ClearAllTiles();
@@ -93,112 +114,7 @@ public class PlayerMovement : MonoBehaviour
 		if (EndPosition.y > StartBoardPos.y || EndPosition.x < StartBoardPos.x || EndPosition.x > EndBoardPos.x)
 			return false;
 
-		List<Vector2Int> AvialiblePosition = new List<Vector2Int>();
-
-		switch (MovingChessPiece)
-		{
-			case ChessPiece.Pawn:
-				{
-					TileBase ForwardTile = BoardTileMap.GetTile(new Vector3Int(StartPosition.x, StartPosition.y + 1, 0));
-					TileBase ForwardLeftTile = BoardTileMap.GetTile(new Vector3Int(StartPosition.x - 1, StartPosition.y + 1, 0));
-					TileBase ForwardRightTile = BoardTileMap.GetTile(new Vector3Int(StartPosition.x + 1, StartPosition.y + 1, 0));
-
-					if (!IsEmptyTile(ForwardTile) && (IsEmptyTile(ForwardLeftTile) && IsEmptyTile(ForwardRightTile))) // can attack forward if moving is blocked
-					{
-						AvialiblePosition.Add(new Vector2Int(StartPosition.x, StartPosition.y + 1));
-					}
-					else
-					{
-						if (IsEmptyTile(ForwardTile))
-							AvialiblePosition.Add(new Vector2Int(StartPosition.x, StartPosition.y + 1));
-						if (IsEnemyTile(ForwardLeftTile))
-							AvialiblePosition.Add(new Vector2Int(StartPosition.x - 1, StartPosition.y + 1));
-						if (IsEnemyTile(ForwardRightTile))
-							AvialiblePosition.Add(new Vector2Int(StartPosition.x + 1, StartPosition.y + 1));
-					}
-				}
-				break;
-			case ChessPiece.Knight:
-				{
-					AvialiblePosition.Add(new Vector2Int(StartPosition.x - 1, StartPosition.y + 2));
-					AvialiblePosition.Add(new Vector2Int(StartPosition.x + 1, StartPosition.y + 2));
-					AvialiblePosition.Add(new Vector2Int(StartPosition.x - 2, StartPosition.y + 1));
-					AvialiblePosition.Add(new Vector2Int(StartPosition.x + 2, StartPosition.y + 1));
-				}
-				break;
-			case ChessPiece.Bishop:
-				{
-					for (int IsLeft = 0; IsLeft < 2; IsLeft++)
-					{
-						for (int i = 1; i <= Mathf.Max(StartBoardPos.x, EndBoardPos.x) - Mathf.Min(StartBoardPos.x, EndBoardPos.x); i++)
-						{
-							AvialiblePosition.Add(new Vector2Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y + i));
-							if (IsEnemyTile(BoardTileMap.GetTile(new Vector3Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y + i, 0))))
-								break;
-						}
-					}
-				}
-				break;
-			case ChessPiece.Rook:
-				{
-					for (int IsLeft = 0; IsLeft < 2; IsLeft++)
-					{
-						for (int i = 1; i <= Mathf.Max(StartBoardPos.x, EndBoardPos.x) - Mathf.Min(StartBoardPos.x, EndBoardPos.x); i++)
-						{
-							AvialiblePosition.Add(new Vector2Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y));
-							if (IsEnemyTile(BoardTileMap.GetTile(new Vector3Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y, 0))))
-								break;
-						}
-					}
-					for (int i = 1; i <= Mathf.Max(StartBoardPos.y, EndBoardPos.y) - Mathf.Min(StartBoardPos.y, EndBoardPos.y); i++)
-					{
-						AvialiblePosition.Add(new Vector2Int(StartPosition.x, StartPosition.y + i));
-						if (IsEnemyTile(BoardTileMap.GetTile(new Vector3Int(StartPosition.x, StartPosition.y + i, 0))))
-							break;
-					}
-				}
-				break;
-			case ChessPiece.Queen:
-				{
-					for (int IsLeft = 0; IsLeft < 2; IsLeft++)
-					{
-						for (int i = 1; i <= Mathf.Max(StartBoardPos.x, EndBoardPos.x) - Mathf.Min(StartBoardPos.x, EndBoardPos.x); i++)
-						{
-							AvialiblePosition.Add(new Vector2Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y + i));
-							if (IsEnemyTile(BoardTileMap.GetTile(new Vector3Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y + i, 0))))
-								break;
-						}
-					}
-					for (int IsLeft = 0; IsLeft < 2; IsLeft++)
-					{
-						for (int i = 1; i <= Mathf.Max(StartBoardPos.x, EndBoardPos.x) - Mathf.Min(StartBoardPos.x, EndBoardPos.x); i++)
-						{
-							AvialiblePosition.Add(new Vector2Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y));
-							if (IsEnemyTile(BoardTileMap.GetTile(new Vector3Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y, 0))))
-								break;
-						}
-					}
-					for (int i = 1; i <= Mathf.Max(StartBoardPos.y, EndBoardPos.y) - Mathf.Min(StartBoardPos.y, EndBoardPos.y); i++)
-					{
-						AvialiblePosition.Add(new Vector2Int(StartPosition.x, StartPosition.y + i));
-						if (IsEnemyTile(BoardTileMap.GetTile(new Vector3Int(StartPosition.x, StartPosition.y + i, 0))))
-							break;
-					}
-				}
-				break;
-			case ChessPiece.King:
-				{
-
-					AvialiblePosition.Add(new Vector2Int(StartPosition.x, StartPosition.y + 1));
-					AvialiblePosition.Add(new Vector2Int(StartPosition.x + 1, StartPosition.y + 1));
-					AvialiblePosition.Add(new Vector2Int(StartPosition.x - 1, StartPosition.y + 1));
-					AvialiblePosition.Add(new Vector2Int(StartPosition.x - 1, StartPosition.y));
-					AvialiblePosition.Add(new Vector2Int(StartPosition.x + 1, StartPosition.y));
-				}
-				break;
-		}
-
-		if (AvialiblePosition.Contains(EndPosition))
+		if (GetAvialibleMoves(StartPosition, MovingChessPiece).Contains(EndPosition))
 			return true;
 		else
 			return false;
@@ -339,37 +255,5 @@ public class PlayerMovement : MonoBehaviour
 		}
 	}
 	
-	private bool IsBenefitTile(in TileBase tile)
-	{
-		if (tile is BenefitTile)
-			return true;
-		else
-			return false;
-	}
-
-	private bool IsEmptyTile(in TileBase tile)
-	{
-		if (tile == null || tile is BenefitTile)
-			return true;
-		else
-			return false;
-	}
-
-	private bool IsEnemyTile(in TileBase tile)
-	{
-		if (tile is EnemyTile)
-			return true;
-		else
-			return false;
-	}
-
-	private TileBase GetTileHighlight(in TileBase tile)
-	{
-		if (IsEnemyTile(tile))
-			return AttackHighlightTile;
-		else if (IsBenefitTile(tile))
-			return EquipHighlightTile;
-		else 
-			return EmptyHighlightTile;
-	}
+	
 }
