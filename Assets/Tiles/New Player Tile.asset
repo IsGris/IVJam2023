@@ -9,10 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f99b137bfbe5b14c9a34a316f42ff6b, type: 3}
-  m_Name: BG_ChessTile
+  m_Script: {fileID: 11500000, guid: fcd0d71137999454cba014cd60cf1895, type: 3}
+  m_Name: New Player Tile
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: 7482667652216324306, guid: b51c4c6b3bad148429e649258725975e, type: 3}
+  m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1
@@ -34,5 +34,4 @@ MonoBehaviour:
   m_InstancedGameObject: {fileID: 0}
   m_Flags: 1
   m_ColliderType: 1
-  WhiteSprite: {fileID: 7482667652216324306, guid: b51c4c6b3bad148429e649258725975e, type: 3}
-  BlackSprite: {fileID: -2413806693520163455, guid: d798774c10309e94d9bff3c83eb4621b, type: 3}
+  Statistics: {fileID: 0}
