@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2afc0006b8309bb46b743711efddaf9d, type: 3}
   m_Name: New Enemy Tile
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: -2413806693520163455, guid: d798774c10309e94d9bff3c83eb4621b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1
@@ -34,3 +34,10 @@ MonoBehaviour:
   m_InstancedGameObject: {fileID: 0}
   m_Flags: 1
   m_ColliderType: 1
+  PawnSprite: {fileID: 0}
+  KnightSprite: {fileID: 0}
+  BishopSprite: {fileID: 0}
+  RookSprite: {fileID: 0}
+  QueenSprite: {fileID: 0}
+  KingSprite: {fileID: 0}
+  Location: {x: 3, y: 0}
