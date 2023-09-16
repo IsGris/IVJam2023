@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea0f4f5718f6bc149aae9a8973cf5e7e, type: 3}
+  m_Name: BenefitTIle
+  m_EditorClassIdentifier: 
+  m_Sprite: {fileID: 2389193319765324094, guid: 326480b6b84b3c84bb46e623a7ef03fc, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Transform:
+    e00: 1
+    e01: 0
+    e02: 0
+    e03: 0
+    e10: 0
+    e11: 1
+    e12: 0
+    e13: 0
+    e20: 0
+    e21: 0
+    e22: 1
+    e23: 0
+    e30: 0
+    e31: 0
+    e32: 0
+    e33: 1
+  m_InstancedGameObject: {fileID: 0}
+  m_Flags: 1
+  m_ColliderType: 1
+  AttackSprite: {fileID: -3560852360957142242, guid: d743bf531e67c73479e584984d6f4468, type: 3}
+  ArmorSprite: {fileID: 2389193319765324094, guid: 326480b6b84b3c84bb46e623a7ef03fc, type: 3}
+  HealthSprite: {fileID: -205270267638800340, guid: 89680e07a1b78a846952aceaef62fa8e, type: 3}
+  PawnSprite: {fileID: 11400000, guid: 312cc391d5b66eb409aa4f91b19a3cc3, type: 2}
+  KnightSprite: {fileID: 11400000, guid: 2797d42b6f2ef464aafc1ce0bd701b64, type: 2}
+  BishopSprite: {fileID: 11400000, guid: 720b48762d59db946aa2c6d5036ee65f, type: 2}
+  RookSprite: {fileID: 11400000, guid: bc33262936ec6dd47844c39ced5e36f2, type: 2}
+  QueenSprite: {fileID: 11400000, guid: 3c1724fc85a52eb4da32adce8e04fe41, type: 2}
+  KingSprite: {fileID: 11400000, guid: bc96e3114c10cea4db263718ee7f979c, type: 2}

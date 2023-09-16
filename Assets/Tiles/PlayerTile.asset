@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fcd0d71137999454cba014cd60cf1895, type: 3}
   m_Name: PlayerTile
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: -9095717837082945937, guid: 41b16d24db92a894e94b0af03716e61e, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Sprite: {fileID: -3977552382547870948, guid: 9b40ff7976ab84f479175336e5509b28, type: 3}
+  m_Color: {r: 255, g: 255, b: 255, a: 255}
   m_Transform:
     e00: 1
     e01: 0
@@ -35,5 +35,11 @@ MonoBehaviour:
   m_Flags: 1
   m_ColliderType: 1
   HitColor: {r: 1, g: 0, b: 0, a: 1}
+  PawnSprite: {fileID: -4051954531382069380, guid: 9b40ff7976ab84f479175336e5509b28, type: 3}
+  KnightSprite: {fileID: 2563889166874717517, guid: 9b40ff7976ab84f479175336e5509b28, type: 3}
+  BishopSprite: {fileID: 4429328221695747361, guid: 9b40ff7976ab84f479175336e5509b28, type: 3}
+  RookSprite: {fileID: -6808010544129747139, guid: 9b40ff7976ab84f479175336e5509b28, type: 3}
+  QueenSprite: {fileID: -141437626377621671, guid: 9b40ff7976ab84f479175336e5509b28, type: 3}
+  KingSprite: {fileID: -5299287544127608355, guid: 9b40ff7976ab84f479175336e5509b28, type: 3}
   Statistics: {fileID: 0}
-  Location: {x: 1, y: 0}
+  Location: {x: 2, y: 0}

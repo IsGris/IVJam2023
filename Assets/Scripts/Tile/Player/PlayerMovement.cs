@@ -11,6 +11,7 @@ public class PlayerMovement : MonoBehaviour
 
 	// tilemaps that used for implementation of class
 	[SerializeField] private Tilemap BoardTileMap = null;
+	[SerializeField] private Tilemap SpriteTileMap = null;
 	[SerializeField] private Tilemap HighlightMovesTileMap = null;
 
 	// tiles that used for implementation of class
@@ -21,6 +22,8 @@ public class PlayerMovement : MonoBehaviour
 	// board bounds
 	[SerializeField] private Vector2Int StartBoardPos;
 	[SerializeField] private Vector2Int EndBoardPos;
+
+	private Vector2Int? ReservedPosition = null;
 
 	// true if highlighted available moves on board
 	private bool IsHighlighting = false;
@@ -39,6 +42,12 @@ public class PlayerMovement : MonoBehaviour
 
 	void Update()
 	{
+		if (ReservedPosition != null && !PlayerTile.instance.IsFighting)
+		{
+			MovePlayer((Vector2Int)ReservedPosition);
+			ReservedPosition = null;
+		}
+
 		if (Input.GetMouseButtonDown(0) && !PlayerTile.instance.IsFighting) // if press mouse button and can move then handle
 		{
 			Vector3Int ClickPosition = BoardTileMap.WorldToCell(Camera.main.ScreenToWorldPoint(Input.mousePosition));
@@ -53,30 +62,36 @@ public class PlayerMovement : MonoBehaviour
 				{
 					// try get benefit from cell then move
 					TryGetBenefit(new Vector2Int(ClickPosition.x, ClickPosition.y));
-					MovePlayer(new Vector2Int(ClickPosition.x, ClickPosition.y));
 					
 					// clear highlights
 					HighlightMovesTileMap.ClearAllTiles();
 					IsHighlighting = false;
 					
-					
-					List<EnemyTile> AllFightingTiles = new List<EnemyTile>(); // an array that contains all the enemies that we have to fight after our move
+					List<Vector3Int> AllFightingTiles = new List<Vector3Int>(); // an array that contains all the enemies that we have to fight after our move
 
 					bool IsPlayerAttackFirst = false;
 					if (IsEnemyTile(ClickedTile)) // if our player attack some chess piece we will attack first
 					{
 						IsPlayerAttackFirst = true;
-						AllFightingTiles.Add(ClickedTile as EnemyTile);
+						AllFightingTiles.Add(ClickPosition);
 					}
-					AllFightingTiles.AddRange(GetAllEnemiesThatCanAttackTile(PlayerTile.instance.Location)); // add all enemies that can attack us after move
+					AllFightingTiles.AddRange(GetAllEnemiesThatCanAttackTile(new Vector2Int(ClickPosition.x, ClickPosition.y))); // add all enemies that can attack us after move
 
 					if (AllFightingTiles.Count > 0) // if have enemies to fight with then fight
 					{
 						// starting fights
-						PlayerTile.instance.IsFighting = true;
-						EnemyTile FirstEnemy = AllFightingTiles[0];
+						if (!IsPlayerAttackFirst)
+						{
+							MovePlayer(new Vector2Int(ClickPosition.x, ClickPosition.y));
+						} else {
+							ReservedPosition = new Vector2Int(ClickPosition.x, ClickPosition.y);
+						}
+						Vector3Int FirstEnemy = AllFightingTiles[0];
 						AllFightingTiles.RemoveAt(0);
 						StartCoroutine(PlayerTile.instance.StartAttack(IsPlayerAttackFirst, FirstEnemy, AllFightingTiles));
+					} else
+					{
+						MovePlayer(new Vector2Int(ClickPosition.x, ClickPosition.y));
 					}
 				} else // if cannot move where player clicked than clear highlights
 				{
@@ -90,10 +105,20 @@ public class PlayerMovement : MonoBehaviour
 				IsHighlighting = true;
 			}
 		}
+
+		if (PlayerTile.instance.Location.y == StartBoardPos.y && !PlayerTile.instance.IsFighting)
+		{
+			ReachEnd();
+		}
+	}
+
+	private void ReachEnd()
+	{
+		Spawner.instance.Spawn(ref PlayerTile.instance.Statistics);
 	}
 
 	// function that moves player to another cell
-	private void MovePlayer(in Vector2Int EndPosition)
+	public void MovePlayer(in Vector2Int EndPosition)
 	{
 		PlayerTile.IsMoving = true;
 		Vector2Int StartLocation = PlayerTile.instance.Location;
@@ -102,26 +127,35 @@ public class PlayerMovement : MonoBehaviour
 		PlayerTile.IsMoving = false;
 	}
 
+	public void StartNewLevel()
+	{
+		MovePlayer(new Vector2Int(StartBoardPos.x + 2, EndBoardPos.y));
+	}
+
 	// try to get benefit if cell have benefit in it
 	private void TryGetBenefit(in Vector2Int BenefitPosition)
 	{
         if ( IsBenefitTile(BoardTileMap.GetTile(new Vector3Int(BenefitPosition.x, BenefitPosition.y, 0))) ) // if has benefit handle
         {
 			BenefitTile tile = BoardTileMap.GetTile(new Vector3Int(BenefitPosition.x, BenefitPosition.y, 0)) as BenefitTile; // get benefit in variable
-			switch (tile.Type) // depends on benefit add to stats
+			switch (Spawner.instance.BenefitsInBoard[new Vector3Int(BenefitPosition.x, BenefitPosition.y, 0)].Item1) // depends on benefit add to stats
 			{
 				case BenefitTile.BenefitType.Attack:
-					PlayerTile.instance.Statistics.Attack += tile.Amount;
+					PlayerTile.instance.Statistics.Attack += Spawner.instance.BenefitsInBoard[new Vector3Int(BenefitPosition.x, BenefitPosition.y, 0)].Item2;
 					break;
 				case BenefitTile.BenefitType.Health:
-					PlayerTile.instance.Statistics.Health += tile.Amount;
+					PlayerTile.instance.Statistics.Health += Spawner.instance.BenefitsInBoard[new Vector3Int(BenefitPosition.x, BenefitPosition.y, 0)].Item2;
 					break;
 				case BenefitTile.BenefitType.Armor:
-					PlayerTile.instance.Statistics.Armor += tile.Amount;
+					PlayerTile.instance.Statistics.Armor += Spawner.instance.BenefitsInBoard[new Vector3Int(BenefitPosition.x, BenefitPosition.y, 0)].Item2;
+					break;
+				case BenefitTile.BenefitType.Skin:
+					PlayerTile.instance.ChessPiece = (ChessPiece)Spawner.instance.BenefitsInBoard[new Vector3Int(BenefitPosition.x, BenefitPosition.y, 0)].Item2;
 					break;
 			}
 			BoardTileMap.SetTile(new Vector3Int(BenefitPosition.x, BenefitPosition.y, 0), null); // remove benefit
-        }
+			SpriteTileMap.SetTile(new Vector3Int(BenefitPosition.x, BenefitPosition.y, 0), null); // remove benefit
+		}
     }
 
 	// check if ChessPiece can move in some cell
@@ -130,7 +164,7 @@ public class PlayerMovement : MonoBehaviour
 		if (EndPosition.y > StartBoardPos.y || EndPosition.x < StartBoardPos.x || EndPosition.x > EndBoardPos.x) // if not in board then false
 			return false;
 
-		if (GetAvialibleMoves(StartPosition, MovingChessPiece).Contains(EndPosition)) // if can move by rules of chess than true else no
+		if (GetAvialiblPlayereMoves(StartPosition, MovingChessPiece).Contains(EndPosition)) // if can move by rules of chess than true else no
 			return true;
 		else
 			return false;
