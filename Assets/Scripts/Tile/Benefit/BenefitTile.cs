@@ -1,3 +1,5 @@
+using TreeEditor;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -9,31 +11,59 @@ public class BenefitTile : Tile
 	{ 
 		Attack,
 		Armor,
-		Health
+		Health,
+		Skin
 	}
-	public BenefitType Type; // type of the benefit
-	public uint Amount; // how many units of the benefit type will be given to player
 
 	// sprites which will be used for cage design depending on the type of benefit
-	[SerializeField] private Sprite AttackSprite;
-	[SerializeField] private Sprite ArmorSprite;
-	[SerializeField] private Sprite HealthSprite;
+	[SerializeField] public Sprite AttackSprite;
+	[SerializeField] public Sprite ArmorSprite;
+	[SerializeField] public Sprite HealthSprite;
 
-	public void Init(BenefitType Type, uint Amount)
+	[SerializeField] private TileBase PawnSprite;
+	[SerializeField] private TileBase KnightSprite;
+	[SerializeField] private TileBase BishopSprite;
+	[SerializeField] private TileBase RookSprite;
+	[SerializeField] private TileBase QueenSprite;
+	[SerializeField] private TileBase KingSprite;
+
+	public void Init(BenefitType Type, ChessPiece? piece = null, Vector3Int? pos = null)
 	{
+		
 		// inits
-		this.Type = Type;
-		this.Amount = Amount;
 		switch (Type) 
 		{
 			case BenefitType.Attack:
-				this.sprite = AttackSprite; 
+				this.sprite = HealthSprite;
 				break;
 			case BenefitType.Armor:
-				this.sprite = ArmorSprite;
+				this.sprite = AttackSprite; 
 				break;
 			case BenefitType.Health:
-				this.sprite = HealthSprite;
+				this.sprite = ArmorSprite;
+				break;
+			case BenefitType.Skin:
+				switch (piece)
+				{
+					case ChessPiece.Pawn:
+						GameObject.FindGameObjectWithTag("SpriteTileMap").GetComponent<Tilemap>().SetTile((Vector3Int)pos, PawnSprite);
+						break;
+					case ChessPiece.Knight:
+						GameObject.FindGameObjectWithTag("SpriteTileMap").GetComponent<Tilemap>().SetTile((Vector3Int)pos, KnightSprite);
+						break;
+					case ChessPiece.Bishop:
+						GameObject.FindGameObjectWithTag("SpriteTileMap").GetComponent<Tilemap>().SetTile((Vector3Int)pos, BishopSprite);
+						break;
+					case ChessPiece.Rook:
+						GameObject.FindGameObjectWithTag("SpriteTileMap").GetComponent<Tilemap>().SetTile((Vector3Int)pos, RookSprite);
+						break;
+					case ChessPiece.Queen:
+						GameObject.FindGameObjectWithTag("SpriteTileMap").GetComponent<Tilemap>().SetTile((Vector3Int)pos, QueenSprite);
+						break;
+					case ChessPiece.King:
+						GameObject.FindGameObjectWithTag("SpriteTileMap").GetComponent<Tilemap>().SetTile((Vector3Int)pos, KingSprite);
+						break;
+				}
 				break;
 		}
 	}

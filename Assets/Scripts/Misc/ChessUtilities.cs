@@ -22,10 +22,10 @@ public static class ChessUtilities
 		ChessUtilities.AttackHighlightTile = AttackHighlightTile;
 	}
 
-	public static List<EnemyTile> GetAllEnemiesThatCanAttackTile(in Vector2Int tile)
+	public static List<Vector3Int> GetAllEnemiesThatCanAttackTile(in Vector2Int tile)
 	{
 		List<EnemyTile> AllEnemies = new List<EnemyTile>(); // all enemies
-		List<EnemyTile> result = new List<EnemyTile>(); // enemies that can attack tile
+		List<Vector3Int> result = new List<Vector3Int>(); // enemies that can attack tile
 		for (int x = BoardTileMap.cellBounds.x; x < BoardTileMap.cellBounds.x + BoardTileMap.cellBounds.size.x; x++) // get all enemies
 		{
 			for (int y = BoardTileMap.cellBounds.y; y < BoardTileMap.cellBounds.y + BoardTileMap.cellBounds.size.y; y++)
@@ -37,15 +37,136 @@ public static class ChessUtilities
 			}
 		}
 
-		foreach (EnemyTile Enemy in AllEnemies) // get enemies that can attack tile
+		foreach (var Enemy in Spawner.instance.EnemiesInBoard) // get enemies that can attack tile
 		{
-			if (GetAvialibleMoves(Enemy.Location, Enemy.ChessPiece).Contains(tile))
-				result.Add(Enemy);
+			if (GetAvialiblEnemyMoves(new Vector2Int(Enemy.Key.x, Enemy.Key.y), Enemy.Value.Item1).Contains(tile))
+				result.Add(Enemy.Key);
 		}
+
+		for (int i = 0; i < result.Count; i++)
+		{
+			if (Spawner.instance.EnemiesInBoard[result[i]].Item1 == ChessPiece.King) // if has king then king will be last
+			{
+				Vector3Int king = result[i];
+				result.RemoveAt(i);
+				result.Add(king);
+			}
+		}
+
 		return result; // return enemies that can attack tile
 	}
 
-	public static List<Vector2Int> GetAvialibleMoves(in Vector2Int StartPosition, in ChessPiece MovingChessPiece)
+	public static List<Vector2Int> GetAvialiblEnemyMoves(in Vector2Int StartPosition, in ChessPiece MovingChessPiece)
+	{
+		List<Vector2Int> AvialiblePosition = new List<Vector2Int>(); // where we can move
+
+		switch (MovingChessPiece) // depends on what ChessPiece we check avialible moves
+		{
+			case ChessPiece.Pawn:
+				{
+					TileBase ForwardTile = BoardTileMap.GetTile(new Vector3Int(StartPosition.x, StartPosition.y - 1, 0));
+					TileBase ForwardLeftTile = BoardTileMap.GetTile(new Vector3Int(StartPosition.x - 1, StartPosition.y - 1, 0));
+					TileBase ForwardRightTile = BoardTileMap.GetTile(new Vector3Int(StartPosition.x + 1, StartPosition.y - 1, 0));
+
+					AvialiblePosition.Add(new Vector2Int(StartPosition.x, StartPosition.y - 1));
+					AvialiblePosition.Add(new Vector2Int(StartPosition.x - 1, StartPosition.y - 1));
+					AvialiblePosition.Add(new Vector2Int(StartPosition.x + 1, StartPosition.y - 1));
+				}
+				break;
+			case ChessPiece.Knight:
+				{ // all knight moves
+					AvialiblePosition.Add(new Vector2Int(StartPosition.x - 1, StartPosition.y - 2));
+					AvialiblePosition.Add(new Vector2Int(StartPosition.x + 1, StartPosition.y - 2));
+					AvialiblePosition.Add(new Vector2Int(StartPosition.x - 2, StartPosition.y - 1));
+					AvialiblePosition.Add(new Vector2Int(StartPosition.x + 2, StartPosition.y - 1));
+				}
+				break;
+			case ChessPiece.Bishop:
+				{ // all bishop moves(can go out of bounds)
+					for (int IsLeft = 0; IsLeft < 2; IsLeft++) // if left then create left diagonal else right diagonal
+					{
+						for (int i = 1; i <= Mathf.Max(StartBoardPos.x, EndBoardPos.x) - Mathf.Min(StartBoardPos.x, EndBoardPos.x); i++) // create diagonal
+						{
+							AvialiblePosition.Add(new Vector2Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y - i));
+							if (IsEnemyTile(BoardTileMap.GetTile(new Vector3Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y - i, 0)))) // check if enemy in path then stop diagonal in this position
+								break;
+						}
+					}
+				}
+				break;
+			case ChessPiece.Rook:
+				{ // all rook moves(can go out of bounds)
+					for (int IsLeft = 0; IsLeft < 2; IsLeft++) // if left then create left horizontal else right horizontal
+					{
+						for (int i = 1; i <= Mathf.Max(StartBoardPos.x, EndBoardPos.x) - Mathf.Min(StartBoardPos.x, EndBoardPos.x); i++) // create horizontal
+						{
+							AvialiblePosition.Add(new Vector2Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y));
+							if (IsEnemyTile(BoardTileMap.GetTile(new Vector3Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y, 0)))) // check if enemy in path then stop horizontal in this position
+								break;
+						}
+					}
+					for (int i = 1; i <= Mathf.Max(StartBoardPos.y, EndBoardPos.y) - Mathf.Min(StartBoardPos.y, EndBoardPos.y); i++) // create vertical
+					{
+						AvialiblePosition.Add(new Vector2Int(StartPosition.x, StartPosition.y - i));
+						if (IsEnemyTile(BoardTileMap.GetTile(new Vector3Int(StartPosition.x, StartPosition.y - i, 0)))) // check if enemy in path then stop vertical in this position
+							break;
+					}
+				}
+				break;
+			case ChessPiece.Queen:
+				{ // bishop moves + rook moves = queen moves
+
+					// all bishop moves(can go out of bounds)
+					for (int IsLeft = 0; IsLeft < 2; IsLeft++) // if left then create left diagonal else right diagonal
+					{
+						for (int i = 1; i <= Mathf.Max(StartBoardPos.x, EndBoardPos.x) - Mathf.Min(StartBoardPos.x, EndBoardPos.x); i++) // create diagonal
+						{
+							AvialiblePosition.Add(new Vector2Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y - i));
+							if (IsEnemyTile(BoardTileMap.GetTile(new Vector3Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y - i, 0))))  // check if enemy in path then stop diagonal in this position
+								break;
+						}
+					}
+
+					// all rook moves(can go out of bounds)
+					for (int IsLeft = 0; IsLeft < 2; IsLeft++) // if left then create left horizontal else right horizontal
+					{
+						for (int i = 1; i <= Mathf.Max(StartBoardPos.x, EndBoardPos.x) - Mathf.Min(StartBoardPos.x, EndBoardPos.x); i++) // create horizontal
+						{
+							AvialiblePosition.Add(new Vector2Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y));
+							if (IsEnemyTile(BoardTileMap.GetTile(new Vector3Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y, 0)))) // check if enemy in path then stop horizontal in this position
+								break;
+						}
+					}
+					for (int i = 1; i <= Mathf.Max(StartBoardPos.y, EndBoardPos.y) - Mathf.Min(StartBoardPos.y, EndBoardPos.y); i++) // create vertical
+					{
+						AvialiblePosition.Add(new Vector2Int(StartPosition.x, StartPosition.y - i));
+					}
+				}
+				break;
+			case ChessPiece.King:
+				{
+					// all king moves
+					AvialiblePosition.Add(new Vector2Int(StartPosition.x, StartPosition.y - 1));
+					AvialiblePosition.Add(new Vector2Int(StartPosition.x + 1, StartPosition.y - 1));
+					AvialiblePosition.Add(new Vector2Int(StartPosition.x - 1, StartPosition.y - 1));
+					AvialiblePosition.Add(new Vector2Int(StartPosition.x - 1, StartPosition.y));
+					AvialiblePosition.Add(new Vector2Int(StartPosition.x + 1, StartPosition.y));
+					for (int IsLeft = 0; IsLeft < 2; IsLeft++) // if left then create left horizontal else right horizontal
+					{
+						for (int i = 1; i <= Mathf.Max(StartBoardPos.x, EndBoardPos.x) - Mathf.Min(StartBoardPos.x, EndBoardPos.x); i++) // create horizontal
+						{
+							AvialiblePosition.Add(new Vector2Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y));
+							if (IsEnemyTile(BoardTileMap.GetTile(new Vector3Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y, 0)))) // check if enemy in path then stop horizontal in this position
+								break;
+						}
+					}
+				}
+				break;
+		}
+		return AvialiblePosition;
+	}
+
+	public static List<Vector2Int> GetAvialiblPlayereMoves(in Vector2Int StartPosition, in ChessPiece MovingChessPiece)
     {
 		List<Vector2Int> AvialiblePosition = new List<Vector2Int>(); // where we can move
 

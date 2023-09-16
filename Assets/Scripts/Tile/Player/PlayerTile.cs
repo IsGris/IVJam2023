@@ -21,6 +21,16 @@ public class PlayerTile : Tile
 {
 	[SerializeField] private Color HitColor; // color when somebody was hit (player or enemy)
 
+	// sprites depends on what ChessPiece is using player
+	[SerializeField] private Sprite PawnSprite;
+	[SerializeField] private Sprite KnightSprite;
+	[SerializeField] private Sprite BishopSprite;
+	[SerializeField] private Sprite RookSprite;
+	[SerializeField] private Sprite QueenSprite;
+	[SerializeField] private Sprite KingSprite;
+
+	[SerializeField] private GameObject DeathCanvas;
+
 	[NonSerialized] public static PlayerTile instance; // player tile can be only one
 	
 	[NonSerialized] public bool IsFighting = false; // true when fights with some enemy
@@ -43,35 +53,64 @@ public class PlayerTile : Tile
 		return true;
 	}
 
-	// when the player begins a battle with one or more opponents, this function is called
-	public IEnumerator StartAttack(bool IsPlayerAttackFirst, EnemyTile enemyTile, List<EnemyTile> EnemiesLeft)
+	public override void GetTileData(Vector3Int position, ITilemap tilemap, ref TileData tileData)
 	{
+		base.GetTileData(position, tilemap, ref tileData);
+		Location = new Vector2Int(position.x, position.y);
+		switch (ChessPiece)
+		{
+			case ChessPiece.Pawn:
+				tileData.sprite = PawnSprite;
+				break;
+			case ChessPiece.Knight:
+				tileData.sprite = KnightSprite;
+				break;
+			case ChessPiece.Bishop:
+				tileData.sprite = BishopSprite;
+				break;
+			case ChessPiece.Rook:
+				tileData.sprite = RookSprite;
+				break;
+			case ChessPiece.Queen:
+				tileData.sprite = QueenSprite;
+				break;
+			case ChessPiece.King:
+				tileData.sprite = KingSprite;
+				break;
+		}
+	}
+
+	// when the player begins a battle with one or more opponents, this function is called
+	public IEnumerator StartAttack(bool IsPlayerAttackFirst, Vector3Int enemyTile, List<Vector3Int> EnemiesLeft)
+	{
+		IsFighting = true;
 		yield return new WaitForSeconds(0.2f); // give let the player realize that there will be a fight now
 
 		if (IsPlayerAttackFirst) // check if player attacks first or enemy
 		{
-			while (EnemiesLeft.Count > 0) // as long as there are opponents with whom the player fights, the loop works
+			while (true) // as long as there are opponents with whom the player fights, the loop works
 			{
-				bool IsKilled = false; // if player killed enemy will be true and it resets every enemy
 				#region PLAYER_ATTACK
-				uint damage = Statistics.Attack; // damage that player give enemy
+				int damage = Statistics.Attack; // damage that player give enemy
 
-				if (damage > enemyTile.Statistics.Armor) // take into account the enemy's armor
+				if (damage > Spawner.instance.EnemiesInBoard[enemyTile].Item2.Armor) // take into account the enemy's armor
 				{
-					damage -= enemyTile.Statistics.Armor;
-					enemyTile.Statistics.Armor = 0;
+					damage -= Spawner.instance.EnemiesInBoard[enemyTile].Item2.Armor;
+					Spawner.instance.EnemiesInBoard[enemyTile].Item2.Armor = 0;
 				}
 				else
 				{
-					enemyTile.Statistics.Armor -= damage;
+					Spawner.instance.EnemiesInBoard[enemyTile].Item2.Armor -= damage;
 					damage = 0;
 				}
 
-				if (enemyTile.Statistics.Health <= damage) // check if this is a fatal blow to the enemy
+				if (Spawner.instance.EnemiesInBoard[enemyTile].Item2.Health <= damage) // check if this is a fatal blow to the enemy
 				{
-					Statistics.Gold += enemyTile.Statistics.GoldCost; // add enemy gold to player
-					enemyTile.Death(); // kill enemy
-					IsKilled = true;
+					Statistics.Gold += Spawner.instance.EnemiesInBoard[enemyTile].Item2.GoldCost; // add enemy gold to player
+					Statistics.Score += 1;
+					Spawner.instance.Board.SetTile(enemyTile, null); // death
+					Spawner.instance.SpriteTileMap.SetTile(enemyTile, null);
+					Spawner.instance.EnemiesInBoard.Remove(enemyTile);
 					if (EnemiesLeft.Count > 0) // switch to another enemy if has else stop fight
 					{
 						enemyTile = EnemiesLeft[0];
@@ -80,24 +119,17 @@ public class PlayerTile : Tile
 					else
 					{
 						PlayerTile.instance.IsFighting = false;
+						break;
 					}
 				}
 				else // if not fatal then reduce enemy hp
 				{
-					enemyTile.Statistics.Health -= damage;
+					Spawner.instance.EnemiesInBoard[enemyTile].Item2.Health -= damage;
 				}
 				#endregion PLAYER_ATTACK
 
-				if (!IsKilled) // if player killed enemy then no enemy to highlight with HitColor
-				{
-					enemyTile.color = HitColor;
-					yield return new WaitForSeconds(0.2f);
-					enemyTile.color = new Color(0, 0, 0);
-					yield return new WaitForSeconds(0.3f);
-				}
-
 				#region ENEMY_ATTACK
-				damage = enemyTile.Statistics.Attack; // damage that enemy give player
+				damage = Spawner.instance.EnemiesInBoard[enemyTile].Item2.Attack; // damage that enemy give player
 				if (damage > this.Statistics.Armor) // take into account the enemy's armor
 				{
 					damage -= this.Statistics.Armor;
@@ -105,32 +137,26 @@ public class PlayerTile : Tile
 				}
 				else
 				{
-					enemyTile.Statistics.Armor -= damage;
+					this.Statistics.Armor -= damage;
 					damage = 0;
 				}
 				if (this.Statistics.Health <= damage) // check if this is a fatal blow to the player
 				{
 					Death();
+					break;
 				}
 				else
 				{
-					enemyTile.Statistics.Health -= damage;
+					this.Statistics.Health -= damage;
 				}
 				#endregion ENEMY_ATTACK
-
-				this.color = HitColor; // highlight player with hit color
-				yield return new WaitForSeconds(0.2f);
-				this.color = new Color(0, 0, 0);
-				yield return new WaitForSeconds(0.3f);
 			}
 		} else
 		{
 			while (true)
 			{
-				bool IsKilled = false; // if player killed enemy will be true and it resets every enemy
-
 				#region ENEMY_ATTACK
-				uint damage = enemyTile.Statistics.Attack; // damage that enemy give player
+				int damage = Spawner.instance.EnemiesInBoard[enemyTile].Item2.Attack; // damage that enemy give player
 				if (damage > this.Statistics.Armor) // take into account the enemy's armor
 				{
 					damage -= this.Statistics.Armor;
@@ -138,43 +164,41 @@ public class PlayerTile : Tile
 				}
 				else
 				{
-					enemyTile.Statistics.Armor -= damage;
+					this.Statistics.Armor -= damage;
 					damage = 0;
 				}
 				if (this.Statistics.Health <= damage) // check if this is a fatal blow to the player
 				{
 					Death();
+					break;
 				}
 				else
 				{
-					enemyTile.Statistics.Health -= damage;
+					this.Statistics.Health -= damage;
 				}
 				#endregion ENEMY_ATTACK
-
-				this.color = HitColor; // highlight player with hit color
-				yield return new WaitForSeconds(0.2f);
-				this.color = new Color(0, 0, 0);
-				yield return new WaitForSeconds(0.5f);
 
 				#region PLAYER_ATTACK
 				damage = Statistics.Attack; // damage that player give enemy
 
-				if (damage > enemyTile.Statistics.Armor) // take into account the enemy's armor
+				if (damage > Spawner.instance.EnemiesInBoard[enemyTile].Item2.Armor) // take into account the enemy's armor
 				{
-					damage -= enemyTile.Statistics.Armor;
-					enemyTile.Statistics.Armor = 0;
+					damage -= Spawner.instance.EnemiesInBoard[enemyTile].Item2.Armor;
+					Spawner.instance.EnemiesInBoard[enemyTile].Item2.Armor = 0;
 				}
 				else
 				{
-					enemyTile.Statistics.Armor -= damage;
+					Spawner.instance.EnemiesInBoard[enemyTile].Item2.Armor -= damage;
 					damage = 0;
 				}
 
-				if (enemyTile.Statistics.Health <= damage) // check if this is a fatal blow to the enemy
+				if (Spawner.instance.EnemiesInBoard[enemyTile].Item2.Health <= damage) // check if this is a fatal blow to the enemy
 				{
-					Statistics.Gold += enemyTile.Statistics.GoldCost; // add enemy gold to player
-					enemyTile.Death(); // kill enemy
-					IsKilled = true;
+					Statistics.Gold += Spawner.instance.EnemiesInBoard[enemyTile].Item2.GoldCost; // add enemy gold to player
+					Statistics.Score += 1;
+					Spawner.instance.Board.SetTile(enemyTile, null); // death
+					Spawner.instance.SpriteTileMap.SetTile(enemyTile, null);
+					Spawner.instance.EnemiesInBoard.Remove(enemyTile);
 					if (EnemiesLeft.Count > 0) // switch to another enemy if has else stop fight
 					{
 						enemyTile = EnemiesLeft[0];
@@ -183,29 +207,24 @@ public class PlayerTile : Tile
 					else
 					{
 						PlayerTile.instance.IsFighting = false;
+						break;
 					}
 				}
 				else // if not fatal then reduce enemy hp
 				{
-					enemyTile.Statistics.Health -= damage;
+					Spawner.instance.EnemiesInBoard[enemyTile].Item2.Health -= damage;
 				}
 				#endregion PLAYER_ATTACK
 
-				if (!IsKilled) // if player killed enemy then no enemy to highlight with HitColor
-				{
-					enemyTile.color = HitColor;
-					yield return new WaitForSeconds(0.2f);
-					enemyTile.color = new Color(0, 0, 0);
-					yield return new WaitForSeconds(0.3f);
-				}
 			}
 		}
-		
+		PlayerTile.instance.IsFighting = false;
+
 	}
 
 	// called when player is died
 	public void Death()
 	{
-
+		DeathCanvas.SetActive(true);
 	}
 }

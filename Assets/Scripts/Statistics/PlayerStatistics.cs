@@ -2,9 +2,10 @@ using UnityEngine;
 
 public class PlayerStatistics : ScriptableObject
 {
-	public uint Attack;
-	public uint Armor;
-	public uint Health;
-	public uint Level;
-	public uint Gold;
+	public int Attack;
+	public int Armor;
+	public int Health;
+	public int Level;
+	public int Gold;
+	public int Score;
 }

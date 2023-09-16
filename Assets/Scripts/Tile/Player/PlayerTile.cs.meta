@@ -3,7 +3,16 @@ guid: fcd0d71137999454cba014cd60cf1895
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - m_Sprite: {fileID: -4051954531382069380, guid: 9b40ff7976ab84f479175336e5509b28, type: 3}
+  - m_InstancedGameObject: {instanceID: 0}
+  - PawnSprite: {fileID: -4051954531382069380, guid: 9b40ff7976ab84f479175336e5509b28, type: 3}
+  - KnightSprite: {fileID: 2563889166874717517, guid: 9b40ff7976ab84f479175336e5509b28, type: 3}
+  - BishopSprite: {fileID: 4429328221695747361, guid: 9b40ff7976ab84f479175336e5509b28, type: 3}
+  - RookSprite: {fileID: -6808010544129747139, guid: 9b40ff7976ab84f479175336e5509b28, type: 3}
+  - QueenSprite: {fileID: -141437626377621671, guid: 9b40ff7976ab84f479175336e5509b28, type: 3}
+  - KingSprite: {fileID: -5299287544127608355, guid: 9b40ff7976ab84f479175336e5509b28, type: 3}
+  - Statistics: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

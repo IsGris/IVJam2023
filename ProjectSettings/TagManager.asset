@@ -3,7 +3,8 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - SpriteTileMap
   layers:
   - Default
   - TransparentFX
@@ -47,6 +48,15 @@ TagManager:
   - name: Board
     uniqueID: 2806421277
     locked: 0
+  - name: SpriteBoard
+    uniqueID: 1416283043
+    locked: 0
   - name: Highlights
     uniqueID: 2445885951
+    locked: 0
+  - name: UI
+    uniqueID: 766906517
+    locked: 0
+  - name: Death
+    uniqueID: 3700295891
     locked: 0
