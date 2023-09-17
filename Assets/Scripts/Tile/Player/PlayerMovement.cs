@@ -206,12 +206,14 @@ public class PlayerMovement : MonoBehaviour
 
 					if ( !IsEmptyTile(ForwardTile) && (IsEmptyTile(ForwardLeftTile) && IsEmptyTile(ForwardRightTile)) ) // can attack forward if moving is blocked
 					{
-						HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x, PlayerPosition.y + 1, 0), AttackHighlightTile);
+						if (!(PlayerPosition.x < StartBoardPos.x || PlayerPosition.x > EndBoardPos.x || (PlayerPosition.y + 1) > StartBoardPos.y))
+							HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x, PlayerPosition.y + 1, 0), AttackHighlightTile);
 					}
 					else // if not blocked use standart pawn rules
 					{
-						if (IsEmptyTile(ForwardTile))
-							HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x, PlayerPosition.y + 1, 0), GetTileHighlight(ForwardTile));
+						if (!(PlayerPosition.x < StartBoardPos.x || PlayerPosition.x > EndBoardPos.x || (PlayerPosition.y + 1) > StartBoardPos.y))
+							if (IsEmptyTile(ForwardTile))
+								HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x, PlayerPosition.y + 1, 0), GetTileHighlight(ForwardTile));
 						if (IsEnemyTile(ForwardLeftTile))
 							HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x - 1, PlayerPosition.y + 1, 0), AttackHighlightTile);
 						if (IsEnemyTile(ForwardRightTile))
@@ -226,10 +228,14 @@ public class PlayerMovement : MonoBehaviour
 					TileBase LeftForwardTile = BoardTileMap.GetTile(new Vector3Int(PlayerPosition.x - 2, PlayerPosition.y + 1, 0));
 					TileBase RightForwardTile = BoardTileMap.GetTile(new Vector3Int(PlayerPosition.x + 2, PlayerPosition.y + 1, 0));
 
-					HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x - 1, PlayerPosition.y + 2, 0), GetTileHighlight(ForwardLeftTile));
-					HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x + 1, PlayerPosition.y + 2, 0), GetTileHighlight(ForwardRightTile));
-					HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x - 2, PlayerPosition.y + 1, 0), GetTileHighlight(LeftForwardTile));
-					HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x + 2, PlayerPosition.y + 1, 0), GetTileHighlight(RightForwardTile));
+					if (!(PlayerPosition.x - 1 < StartBoardPos.x || PlayerPosition.x - 1 > EndBoardPos.x || (PlayerPosition.y + 2) > StartBoardPos.y))
+						HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x - 1, PlayerPosition.y + 2, 0), GetTileHighlight(ForwardLeftTile));
+					if (!(PlayerPosition.x +  1 < StartBoardPos.x || PlayerPosition.x + 1 > EndBoardPos.x || (PlayerPosition.y + 2) > StartBoardPos.y))
+						HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x + 1, PlayerPosition.y + 2, 0), GetTileHighlight(ForwardRightTile));
+					if (!(PlayerPosition.x - 2 < StartBoardPos.x || PlayerPosition.x - 2 > EndBoardPos.x || (PlayerPosition.y + 1) > StartBoardPos.y))
+						HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x - 2, PlayerPosition.y + 1, 0), GetTileHighlight(LeftForwardTile));
+					if (!(PlayerPosition.x + 2 < StartBoardPos.x || PlayerPosition.x + 2 > EndBoardPos.x || (PlayerPosition.y + 1) > StartBoardPos.y))
+						HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x + 2, PlayerPosition.y + 1, 0), GetTileHighlight(RightForwardTile));
 				}
 				break;
 			case ChessPiece.Bishop:
@@ -243,7 +249,8 @@ public class PlayerMovement : MonoBehaviour
 								HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x + (IsLeft == 0 ? -i : i), PlayerPosition.y + i, 0), AttackHighlightTile);
 								break;
 							}
-							HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x + (IsLeft == 0 ? -i : i), PlayerPosition.y + i, 0), GetTileHighlight(BoardTileMap.GetTile(new Vector3Int(PlayerPosition.x + (IsLeft == 0 ? -i : i), PlayerPosition.y + i, 0))));
+							if (!((PlayerPosition.x + (IsLeft == 0 ? -i : i)) < StartBoardPos.x || (PlayerPosition.x + (IsLeft == 0 ? -i : i)) > EndBoardPos.x || (PlayerPosition.y + i) > StartBoardPos.y))
+								HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x + (IsLeft == 0 ? -i : i), PlayerPosition.y + i, 0), GetTileHighlight(BoardTileMap.GetTile(new Vector3Int(PlayerPosition.x + (IsLeft == 0 ? -i : i), PlayerPosition.y + i, 0))));
 						}
 					}
 				}
@@ -259,7 +266,8 @@ public class PlayerMovement : MonoBehaviour
 								HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x + (IsLeft == 0 ? -i : i), PlayerPosition.y, 0), AttackHighlightTile);
 								break;
 							}
-							HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x + (IsLeft == 0 ? -i : i), PlayerPosition.y, 0), GetTileHighlight(BoardTileMap.GetTile(new Vector3Int(PlayerPosition.x + (IsLeft == 0 ? -i : i), PlayerPosition.y, 0))));
+							if (!((PlayerPosition.x + (IsLeft == 0 ? -i : i)) < StartBoardPos.x || (PlayerPosition.x + (IsLeft == 0 ? -i : i)) > EndBoardPos.x || (PlayerPosition.y) > StartBoardPos.y))
+								HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x + (IsLeft == 0 ? -i : i), PlayerPosition.y, 0), GetTileHighlight(BoardTileMap.GetTile(new Vector3Int(PlayerPosition.x + (IsLeft == 0 ? -i : i), PlayerPosition.y, 0))));
 						}
 					}
 					for (int i = 1; i <= Mathf.Max(StartBoardPos.y, EndBoardPos.y) - Mathf.Min(StartBoardPos.y, EndBoardPos.y); i++) // create vertical
@@ -269,7 +277,8 @@ public class PlayerMovement : MonoBehaviour
 							HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x, PlayerPosition.y + i, 0), AttackHighlightTile);
 							break;
 						}
-						HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x, PlayerPosition.y + i, 0), GetTileHighlight(BoardTileMap.GetTile(new Vector3Int(PlayerPosition.x, PlayerPosition.y + i, 0))));
+						if (!((PlayerPosition.x < StartBoardPos.x) || (PlayerPosition.x > EndBoardPos.x) || (PlayerPosition.y + i) > StartBoardPos.y))
+							HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x, PlayerPosition.y + i, 0), GetTileHighlight(BoardTileMap.GetTile(new Vector3Int(PlayerPosition.x, PlayerPosition.y + i, 0))));
 					}
 				}
 				break;
@@ -286,7 +295,8 @@ public class PlayerMovement : MonoBehaviour
 								HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x + (IsLeft == 0 ? -i : i), PlayerPosition.y + i, 0), AttackHighlightTile);
 								break;
 							}
-							HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x + (IsLeft == 0 ? -i : i), PlayerPosition.y + i, 0), GetTileHighlight(BoardTileMap.GetTile(new Vector3Int(PlayerPosition.x + (IsLeft == 0 ? -i : i), PlayerPosition.y + i, 0))));
+							if (!((PlayerPosition.x + (IsLeft == 0 ? -i : i)) < StartBoardPos.x || (PlayerPosition.x + (IsLeft == 0 ? -i : i)) > EndBoardPos.x || (PlayerPosition.y + i) > StartBoardPos.y))
+								HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x + (IsLeft == 0 ? -i : i), PlayerPosition.y + i, 0), GetTileHighlight(BoardTileMap.GetTile(new Vector3Int(PlayerPosition.x + (IsLeft == 0 ? -i : i), PlayerPosition.y + i, 0))));
 						}
 					}
 
@@ -300,7 +310,8 @@ public class PlayerMovement : MonoBehaviour
 								HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x + (IsLeft == 0 ? -i : i), PlayerPosition.y, 0), AttackHighlightTile);
 								break;
 							}
-							HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x + (IsLeft == 0 ? -i : i), PlayerPosition.y, 0), GetTileHighlight(BoardTileMap.GetTile(new Vector3Int(PlayerPosition.x + (IsLeft == 0 ? -i : i), PlayerPosition.y, 0))));
+							if (!((PlayerPosition.x + (IsLeft == 0 ? -i : i)) < StartBoardPos.x || (PlayerPosition.x + (IsLeft == 0 ? -i : i)) > EndBoardPos.x || (PlayerPosition.y) > StartBoardPos.y))
+								HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x + (IsLeft == 0 ? -i : i), PlayerPosition.y, 0), GetTileHighlight(BoardTileMap.GetTile(new Vector3Int(PlayerPosition.x + (IsLeft == 0 ? -i : i), PlayerPosition.y, 0))));
 						}
 					}
 					for (int i = 1; i <= Mathf.Max(StartBoardPos.y, EndBoardPos.y) - Mathf.Min(StartBoardPos.y, EndBoardPos.y); i++) // create vertical
@@ -310,7 +321,8 @@ public class PlayerMovement : MonoBehaviour
 							HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x, PlayerPosition.y + i, 0), AttackHighlightTile);
 							break;
 						}
-						HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x, PlayerPosition.y + i, 0), GetTileHighlight(BoardTileMap.GetTile(new Vector3Int(PlayerPosition.x, PlayerPosition.y + i, 0))));
+						if (!((PlayerPosition.x < StartBoardPos.x) || (PlayerPosition.x > EndBoardPos.x) || (PlayerPosition.y + i) > StartBoardPos.y))
+							HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x, PlayerPosition.y + i, 0), GetTileHighlight(BoardTileMap.GetTile(new Vector3Int(PlayerPosition.x, PlayerPosition.y + i, 0))));
 					}
 				}
 				break;
@@ -322,11 +334,20 @@ public class PlayerMovement : MonoBehaviour
 					TileBase LeftTile = BoardTileMap.GetTile(new Vector3Int(PlayerPosition.x - 1, PlayerPosition.y, 0));
 					TileBase RightTile = BoardTileMap.GetTile(new Vector3Int(PlayerPosition.x + 1, PlayerPosition.y, 0));
 
-					HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x, PlayerPosition.y + 1, 0), GetTileHighlight(ForwardTile));
-					HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x + 1, PlayerPosition.y + 1, 0), GetTileHighlight(ForwardRightTile));
-					HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x - 1, PlayerPosition.y + 1, 0), GetTileHighlight(ForwardLeftTile));
-					HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x - 1, PlayerPosition.y, 0), GetTileHighlight(LeftTile));
-					HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x + 1, PlayerPosition.y, 0), GetTileHighlight(RightTile));
+					if (!(PlayerPosition.x < StartBoardPos.x || PlayerPosition.x > EndBoardPos.x || (PlayerPosition.y + 1) > StartBoardPos.y))
+						HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x, PlayerPosition.y + 1, 0), GetTileHighlight(ForwardTile));
+
+					if (!(PlayerPosition.x + 1 < StartBoardPos.x || PlayerPosition.x + 1 > EndBoardPos.x || (PlayerPosition.y + 1) > StartBoardPos.y))
+						HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x + 1, PlayerPosition.y + 1, 0), GetTileHighlight(ForwardRightTile));
+
+					if (!(PlayerPosition.x - 1 < StartBoardPos.x || PlayerPosition.x - 1 > EndBoardPos.x || (PlayerPosition.y + 1) > StartBoardPos.y))
+						HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x - 1, PlayerPosition.y + 1, 0), GetTileHighlight(ForwardLeftTile));
+
+					if (!(PlayerPosition.x - 1 < StartBoardPos.x || PlayerPosition.x - 1 > EndBoardPos.x || (PlayerPosition.y) > StartBoardPos.y))
+						HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x - 1, PlayerPosition.y, 0), GetTileHighlight(LeftTile));
+
+					if (!(PlayerPosition.x + 1 < StartBoardPos.x || PlayerPosition.x + 1 > EndBoardPos.x || (PlayerPosition.y) > StartBoardPos.y))
+						HighlightMovesTileMap.SetTile(new Vector3Int(PlayerPosition.x + 1, PlayerPosition.y, 0), GetTileHighlight(RightTile));
 				}
 				break;
 		}
