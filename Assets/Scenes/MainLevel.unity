@@ -132,7 +132,7 @@ GameObject:
   - component: {fileID: 202997782}
   - component: {fileID: 202997781}
   m_Layer: 5
-  m_Name: HP (1)
+  m_Name: Score
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -153,10 +153,10 @@ RectTransform:
   - {fileID: 1960676214}
   m_Father: {fileID: 1675901501}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.28911835, y: 0.015665043}
-  m_AnchorMax: {x: 0.365, y: 0.15765777}
-  m_AnchoredPosition: {x: 0.6998596, y: 0.8000488}
-  m_SizeDelta: {x: 2.0299988, y: 2.980011}
+  m_AnchorMin: {x: 0.28911835, y: 0.69566506}
+  m_AnchorMax: {x: 0.365, y: 0.83878}
+  m_AnchoredPosition: {x: -0.51498413, y: 0.5}
+  m_SizeDelta: {x: 1.0299988, y: 1.9799805}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &202997781
 MonoBehaviour:
@@ -178,7 +178,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -205270267638800340, guid: 89680e07a1b78a846952aceaef62fa8e, type: 3}
+  m_Sprite: {fileID: -3560852360957142242, guid: d743bf531e67c73479e584984d6f4468, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -689,7 +689,7 @@ GameObject:
   - component: {fileID: 600631128}
   - component: {fileID: 600631127}
   m_Layer: 5
-  m_Name: HPText
+  m_Name: CoinsText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -711,7 +711,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 28.956375, y: -16.232437}
+  m_AnchoredPosition: {x: 28.95578, y: -16.2323}
   m_SizeDelta: {x: -3.1100006, y: -70}
   m_Pivot: {x: 0.25668195, y: 0.7318911}
 --- !u!114 &600631127
@@ -761,7 +761,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24.25
+  m_fontSize: 24.15
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -823,7 +823,7 @@ GameObject:
   - component: {fileID: 667980235}
   - component: {fileID: 667980234}
   m_Layer: 5
-  m_Name: HP (2)
+  m_Name: Coins
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -844,10 +844,10 @@ RectTransform:
   - {fileID: 600631126}
   m_Father: {fileID: 1675901501}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.28911835, y: 0.015665043}
-  m_AnchorMax: {x: 0.365, y: 0.15765777}
-  m_AnchoredPosition: {x: 0.6998596, y: 0.8000488}
-  m_SizeDelta: {x: 2.0299988, y: 2.980011}
+  m_AnchorMin: {x: 0.65000004, y: 0.69566506}
+  m_AnchorMax: {x: 0.725, y: 0.83878}
+  m_AnchoredPosition: {x: -2, y: 0.65997314}
+  m_SizeDelta: {x: 4.0300293, y: 1.9799805}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &667980234
 MonoBehaviour:
@@ -869,7 +869,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -205270267638800340, guid: 89680e07a1b78a846952aceaef62fa8e, type: 3}
+  m_Sprite: {fileID: 8003260396191338441, guid: 9c80be0397d65d64abb2d0425f00c0e6, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2266,6 +2266,8 @@ GameObject:
   - component: {fileID: 1786079700}
   - component: {fileID: 1786079701}
   - component: {fileID: 1786079702}
+  - component: {fileID: 1786079704}
+  - component: {fileID: 1786079703}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -2301,11 +2303,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BoardTileMap: {fileID: 737672729}
-  SpriteTileMap: {fileID: 0}
+  SpriteTileMap: {fileID: 1675483688}
   HighlightMovesTileMap: {fileID: 327505027}
   EquipHighlightTile: {fileID: 11400000, guid: 970098a717eac01448df333be2aa3cc1, type: 2}
   EmptyHighlightTile: {fileID: 11400000, guid: 0a8e1f87521fdc040843edcf473db42f, type: 2}
   AttackHighlightTile: {fileID: 11400000, guid: 951fa9f6dafe0d04193dd42344350a2e, type: 2}
+  SFX: {fileID: 1786079703}
+  Music: {fileID: 1786079704}
+  MoveSound: {fileID: 8300000, guid: 169eef7160a71704ab7baa86f4112199, type: 3}
+  DeathSound: {fileID: 8300000, guid: b3d7db4d490532a49a47dcacc32a9fab, type: 3}
   StartBoardPos: {x: -1, y: 6}
   EndBoardPos: {x: 3, y: -3}
 --- !u!114 &1786079702
@@ -2320,6 +2326,180 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de4cf365a1eeaf04584b9b7a049b6925, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!82 &1786079703
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1786079699}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 0.125
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 2
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0.002
+      value: 1
+      inSlope: -500.20065
+      outSlope: -500.20065
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!82 &1786079704
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1786079699}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 0.116
+  m_Pitch: 1
+  Loop: 1
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 2
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0.002
+      value: 1
+      inSlope: -500.20065
+      outSlope: -500.20065
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &1888477350
 GameObject:
   m_ObjectHideFlags: 0
@@ -2408,7 +2588,7 @@ GameObject:
   - component: {fileID: 1960676216}
   - component: {fileID: 1960676215}
   m_Layer: 5
-  m_Name: HPText
+  m_Name: ScoreText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2480,7 +2660,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24.25
+  m_fontSize: 24.15
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -2544,11 +2724,11 @@ GameObject:
   - component: {fileID: 1967838588}
   m_Layer: 5
   m_Name: Death
-  m_TagString: Untagged
+  m_TagString: DeathCanvas
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1967838588
 MonoBehaviour:
   m_ObjectHideFlags: 0

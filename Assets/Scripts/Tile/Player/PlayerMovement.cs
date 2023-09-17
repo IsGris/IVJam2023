@@ -12,12 +12,18 @@ public class PlayerMovement : MonoBehaviour
 	// tilemaps that used for implementation of class
 	[SerializeField] private Tilemap BoardTileMap = null;
 	[SerializeField] private Tilemap SpriteTileMap = null;
-	[SerializeField] private Tilemap HighlightMovesTileMap = null;
+	[SerializeField] public Tilemap HighlightMovesTileMap = null;
 
 	// tiles that used for implementation of class
 	[SerializeField] private TileBase EquipHighlightTile = null;
 	[SerializeField] private TileBase EmptyHighlightTile = null;
-	[SerializeField] private TileBase AttackHighlightTile = null;
+	[SerializeField] public TileBase AttackHighlightTile = null;
+
+	[SerializeField] private AudioSource SFX;
+	[SerializeField] private AudioSource Music;
+	[SerializeField] private AudioClip MoveSound;
+	[SerializeField] private AudioClip DeathSound;
+	[SerializeField] private AudioClip AttackSound;
 
 	// board bounds
 	[SerializeField] private Vector2Int StartBoardPos;
@@ -38,6 +44,9 @@ public class PlayerMovement : MonoBehaviour
 		Assert.IsNotNull(AttackHighlightTile);
 		instance = this;
 		ChessUtilities.Init(BoardTileMap, StartBoardPos, EndBoardPos, EquipHighlightTile, EmptyHighlightTile, AttackHighlightTile);
+		PlayerTile.DeathCanvas = GameObject.FindGameObjectWithTag("DeathCanvas");
+		PlayerTile.DeathCanvas.SetActive(false);
+		Music.Play();
 	}
 
 	void Update()
@@ -117,10 +126,22 @@ public class PlayerMovement : MonoBehaviour
 		Spawner.instance.Spawn(ref PlayerTile.instance.Statistics);
 	}
 
+	public void PlayAttackSound()
+	{
+		SFX.PlayOneShot(AttackSound);
+	}
+
+	public void PlayDeathSound()
+	{
+		Music.Stop();
+		SFX.PlayOneShot(DeathSound);
+	}
+
 	// function that moves player to another cell
 	public void MovePlayer(in Vector2Int EndPosition)
 	{
 		PlayerTile.IsMoving = true;
+		SFX.PlayOneShot(MoveSound);
 		Vector2Int StartLocation = PlayerTile.instance.Location;
 		BoardTileMap.SetTile(new Vector3Int(EndPosition.x, EndPosition.y, 0), PlayerTile.instance);
 		BoardTileMap.SetTile(new Vector3Int(StartLocation.x, StartLocation.y, 0), null);

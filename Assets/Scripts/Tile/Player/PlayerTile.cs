@@ -29,8 +29,7 @@ public class PlayerTile : Tile
 	[SerializeField] private Sprite QueenSprite;
 	[SerializeField] private Sprite KingSprite;
 
-	[SerializeField] private GameObject DeathCanvas;
-
+	[NonSerialized] public static GameObject DeathCanvas; // player tile can be only one
 	[NonSerialized] public static PlayerTile instance; // player tile can be only one
 	
 	[NonSerialized] public bool IsFighting = false; // true when fights with some enemy
@@ -90,9 +89,16 @@ public class PlayerTile : Tile
 		{
 			while (true) // as long as there are opponents with whom the player fights, the loop works
 			{
+				#region HIGHLIGHT
+				PlayerMovement.instance.HighlightMovesTileMap.SetTile(enemyTile, PlayerMovement.instance.AttackHighlightTile);
+				PlayerMovement.instance.HighlightMovesTileMap.SetTile(new Vector3Int(PlayerTile.instance.Location.x, PlayerTile.instance.Location.y), PlayerMovement.instance.AttackHighlightTile);
+				#endregion HIGHLIGHT
+				
+				yield return new WaitForSeconds(0.4f); // give let the player realize that there will be a fight now
+
 				#region PLAYER_ATTACK
 				int damage = Statistics.Attack; // damage that player give enemy
-
+				PlayerMovement.instance.PlayAttackSound();
 				if (damage > Spawner.instance.EnemiesInBoard[enemyTile].Item2.Armor) // take into account the enemy's armor
 				{
 					damage -= Spawner.instance.EnemiesInBoard[enemyTile].Item2.Armor;
@@ -108,6 +114,7 @@ public class PlayerTile : Tile
 				{
 					Statistics.Gold += Spawner.instance.EnemiesInBoard[enemyTile].Item2.GoldCost; // add enemy gold to player
 					Statistics.Score += 1;
+					PlayerMovement.instance.HighlightMovesTileMap.ClearAllTiles();
 					Spawner.instance.Board.SetTile(enemyTile, null); // death
 					Spawner.instance.SpriteTileMap.SetTile(enemyTile, null);
 					Spawner.instance.EnemiesInBoard.Remove(enemyTile);
@@ -128,6 +135,8 @@ public class PlayerTile : Tile
 				}
 				#endregion PLAYER_ATTACK
 
+				yield return new WaitForSeconds(0.4f); // give let the player realize that there will be a fight now
+
 				#region ENEMY_ATTACK
 				damage = Spawner.instance.EnemiesInBoard[enemyTile].Item2.Attack; // damage that enemy give player
 				if (damage > this.Statistics.Armor) // take into account the enemy's armor
@@ -147,6 +156,7 @@ public class PlayerTile : Tile
 				}
 				else
 				{
+					PlayerMovement.instance.PlayAttackSound();
 					this.Statistics.Health -= damage;
 				}
 				#endregion ENEMY_ATTACK
@@ -155,6 +165,13 @@ public class PlayerTile : Tile
 		{
 			while (true)
 			{
+				#region HIGHLIGHT
+				PlayerMovement.instance.HighlightMovesTileMap.SetTile(enemyTile, PlayerMovement.instance.AttackHighlightTile);
+				PlayerMovement.instance.HighlightMovesTileMap.SetTile(new Vector3Int(PlayerTile.instance.Location.x, PlayerTile.instance.Location.y), PlayerMovement.instance.AttackHighlightTile);
+				#endregion HIGHLIGHT
+
+				yield return new WaitForSeconds(0.4f); // give let the player realize that there will be a fight now
+
 				#region ENEMY_ATTACK
 				int damage = Spawner.instance.EnemiesInBoard[enemyTile].Item2.Attack; // damage that enemy give player
 				if (damage > this.Statistics.Armor) // take into account the enemy's armor
@@ -174,13 +191,17 @@ public class PlayerTile : Tile
 				}
 				else
 				{
+					PlayerMovement.instance.PlayAttackSound();
 					this.Statistics.Health -= damage;
 				}
 				#endregion ENEMY_ATTACK
 
+				yield return new WaitForSeconds(0.4f); // give let the player realize that there will be a fight now
+
 				#region PLAYER_ATTACK
 				damage = Statistics.Attack; // damage that player give enemy
 
+				PlayerMovement.instance.PlayAttackSound();
 				if (damage > Spawner.instance.EnemiesInBoard[enemyTile].Item2.Armor) // take into account the enemy's armor
 				{
 					damage -= Spawner.instance.EnemiesInBoard[enemyTile].Item2.Armor;
@@ -196,6 +217,7 @@ public class PlayerTile : Tile
 				{
 					Statistics.Gold += Spawner.instance.EnemiesInBoard[enemyTile].Item2.GoldCost; // add enemy gold to player
 					Statistics.Score += 1;
+					PlayerMovement.instance.HighlightMovesTileMap.ClearAllTiles();
 					Spawner.instance.Board.SetTile(enemyTile, null); // death
 					Spawner.instance.SpriteTileMap.SetTile(enemyTile, null);
 					Spawner.instance.EnemiesInBoard.Remove(enemyTile);
@@ -226,5 +248,6 @@ public class PlayerTile : Tile
 	public void Death()
 	{
 		DeathCanvas.SetActive(true);
+		PlayerMovement.instance.PlayDeathSound();
 	}
 }
