@@ -38,6 +38,8 @@ public class PlayerTile : Tile
 	public Vector2Int Location;
 	public static bool IsMoving = false; // if the player is currently moving, this variable will be true
 
+	public bool IsKilledFirstMove = false;
+
 	public override bool StartUp(Vector3Int location, ITilemap tilemap, GameObject go)
 	{
 		// inits
@@ -128,6 +130,7 @@ public class PlayerTile : Tile
 						PlayerTile.instance.IsFighting = false;
 						break;
 					}
+					IsKilledFirstMove = true;
 				}
 				else // if not fatal then reduce enemy hp
 				{
