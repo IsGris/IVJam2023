@@ -24,6 +24,10 @@ public class Spawner : MonoBehaviour
 	[SerializeField] private TileBase EnemyQueenSprite;
 	[SerializeField] private TileBase EnemyKingSprite;
 
+	[SerializeField] private TileBase AttackSprite;
+	[SerializeField] private TileBase ArmorSprite;
+	[SerializeField] private TileBase HealthSprite;
+
 	[NonSerialized] public Dictionary<Vector3Int, Tuple<BenefitTile.BenefitType, int>> BenefitsInBoard = new Dictionary<Vector3Int, Tuple<BenefitTile.BenefitType, int>>();
 	[NonSerialized] public Dictionary<Vector3Int, Tuple<ChessPiece, EnemyStatistics>> EnemiesInBoard = new Dictionary<Vector3Int, Tuple<ChessPiece, EnemyStatistics>>();
 
@@ -68,20 +72,20 @@ public class Spawner : MonoBehaviour
 			}
 
 			Board.SetTile(CurrentBenefitPos, Benefit);
-
+			
 			switch (i)
 			{
 				case 0:
 					BenefitsInBoard.Add(CurrentBenefitPos, new Tuple<BenefitTile.BenefitType, int>(BenefitTile.BenefitType.Attack, GetLevelItemAttack(statistics.Level)));
-					(Board.GetTile(CurrentBenefitPos) as BenefitTile).Init(BenefitTile.BenefitType.Attack);
+					SpriteTileMap.SetTile(CurrentBenefitPos, AttackSprite);
 					break;
 				case 1:
 					BenefitsInBoard.Add(CurrentBenefitPos, new Tuple<BenefitTile.BenefitType, int>(BenefitTile.BenefitType.Health, GetLevelItemHealth(statistics.Level)));
-					(Board.GetTile(CurrentBenefitPos) as BenefitTile).Init(BenefitTile.BenefitType.Health);
+					SpriteTileMap.SetTile(CurrentBenefitPos, HealthSprite);
 					break;
 				case 2:
 					BenefitsInBoard.Add(CurrentBenefitPos, new Tuple<BenefitTile.BenefitType, int>(BenefitTile.BenefitType.Armor, GetLevelItemArmor(statistics.Level)));
-					(Board.GetTile(CurrentBenefitPos) as BenefitTile).Init(BenefitTile.BenefitType.Armor);
+					SpriteTileMap.SetTile(CurrentBenefitPos, ArmorSprite);
 					break;
 			}
 		}
@@ -109,7 +113,7 @@ public class Spawner : MonoBehaviour
 			BenefitsInBoard.Add(CurrentBenefitPos, new Tuple<BenefitTile.BenefitType, int>(BenefitTile.BenefitType.Skin, NewSkin));
 		}*/
 
-		for (int i = 0; i < 5; i++)
+		for (int i = 0; i < 15; i++)
 		{
 			Vector3Int CurrentEnemyPos;
 			while (true)

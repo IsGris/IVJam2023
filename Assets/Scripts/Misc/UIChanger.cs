@@ -7,7 +7,6 @@ public class UIChanger : MonoBehaviour
     [SerializeField] TextMeshProUGUI AttackText;
     [SerializeField] TextMeshProUGUI ArmorText;
     [SerializeField] TextMeshProUGUI ScoreText;
-    [SerializeField] TextMeshProUGUI GoldText;
 
     void Update()
     {
@@ -15,6 +14,5 @@ public class UIChanger : MonoBehaviour
 		AttackText.text = PlayerTile.instance.Statistics.Attack.ToString();
 		ArmorText.text = PlayerTile.instance.Statistics.Armor.ToString();
 		ScoreText.text = PlayerTile.instance.Statistics.Score.ToString();
-		GoldText.text = PlayerTile.instance.Statistics.Gold.ToString();
     }
 }

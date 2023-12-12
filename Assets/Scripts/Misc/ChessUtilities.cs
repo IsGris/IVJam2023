@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -140,6 +141,8 @@ public static class ChessUtilities
 					for (int i = 1; i <= Mathf.Max(StartBoardPos.y, EndBoardPos.y) - Mathf.Min(StartBoardPos.y, EndBoardPos.y); i++) // create vertical
 					{
 						AvialiblePosition.Add(new Vector2Int(StartPosition.x, StartPosition.y - i));
+						if (IsEnemyTile(BoardTileMap.GetTile(new Vector3Int(StartPosition.x, StartPosition.y - i, 0)))) // check if enemy in path then stop horizontal in this position
+							break;
 					}
 				}
 				break;
@@ -207,9 +210,12 @@ public static class ChessUtilities
 					{
 						for (int i = 1; i <= Mathf.Max(StartBoardPos.x, EndBoardPos.x) - Mathf.Min(StartBoardPos.x, EndBoardPos.x); i++) // create diagonal
 						{
-							AvialiblePosition.Add(new Vector2Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y + i));
-							if (IsEnemyTile(BoardTileMap.GetTile(new Vector3Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y + i, 0)))) // check if enemy in path then stop diagonal in this position
+							if (Spawner.instance.EnemiesInBoard.ContainsKey(new Vector3Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y + i, 0))) // check if enemy in path then stop diagonal in this position
+							{
+								AvialiblePosition.Add(new Vector2Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y + i));
 								break;
+							}
+							AvialiblePosition.Add(new Vector2Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y + i));
 						}
 					}
 				}
@@ -220,30 +226,39 @@ public static class ChessUtilities
 					{
 						for (int i = 1; i <= Mathf.Max(StartBoardPos.x, EndBoardPos.x) - Mathf.Min(StartBoardPos.x, EndBoardPos.x); i++) // create horizontal
 						{
-							AvialiblePosition.Add(new Vector2Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y));
-							if (IsEnemyTile(BoardTileMap.GetTile(new Vector3Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y, 0)))) // check if enemy in path then stop horizontal in this position
+							if (Spawner.instance.EnemiesInBoard.ContainsKey(new Vector3Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y, 0))) // check if enemy in path then stop horizontal in this position
+							{
+								AvialiblePosition.Add(new Vector2Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y));
 								break;
+							}
+							AvialiblePosition.Add(new Vector2Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y));
 						}
 					}
 					for (int i = 1; i <= Mathf.Max(StartBoardPos.y, EndBoardPos.y) - Mathf.Min(StartBoardPos.y, EndBoardPos.y); i++) // create vertical
 					{
-						AvialiblePosition.Add(new Vector2Int(StartPosition.x, StartPosition.y + i));
-						if (IsEnemyTile(BoardTileMap.GetTile(new Vector3Int(StartPosition.x, StartPosition.y + i, 0)))) // check if enemy in path then stop vertical in this position
+						if (Spawner.instance.EnemiesInBoard.ContainsKey(new Vector3Int(StartPosition.x, StartPosition.y + i, 0))) // check if enemy in path then stop vertical in this position
+						{
+							AvialiblePosition.Add(new Vector2Int(StartPosition.x, StartPosition.y + i));
 							break;
+						}
+						AvialiblePosition.Add(new Vector2Int(StartPosition.x, StartPosition.y + i));
 					}
 				}
 				break;
 			case ChessPiece.Queen:
 				{ // bishop moves + rook moves = queen moves
-					
+
 					// all bishop moves(can go out of bounds)
 					for (int IsLeft = 0; IsLeft < 2; IsLeft++) // if left then create left diagonal else right diagonal
 					{
 						for (int i = 1; i <= Mathf.Max(StartBoardPos.x, EndBoardPos.x) - Mathf.Min(StartBoardPos.x, EndBoardPos.x); i++) // create diagonal
 						{
-							AvialiblePosition.Add(new Vector2Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y + i));
-							if (IsEnemyTile(BoardTileMap.GetTile(new Vector3Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y + i, 0))))  // check if enemy in path then stop diagonal in this position
+							if (Spawner.instance.EnemiesInBoard.ContainsKey(new Vector3Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y + i, 0))) // check if enemy in path then stop diagonal in this position
+							{
+								AvialiblePosition.Add(new Vector2Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y + i));
 								break;
+							}
+							AvialiblePosition.Add(new Vector2Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y + i));
 						}
 					}
 
@@ -252,16 +267,23 @@ public static class ChessUtilities
 					{
 						for (int i = 1; i <= Mathf.Max(StartBoardPos.x, EndBoardPos.x) - Mathf.Min(StartBoardPos.x, EndBoardPos.x); i++) // create horizontal
 						{
-							AvialiblePosition.Add(new Vector2Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y));
-							if (IsEnemyTile(BoardTileMap.GetTile(new Vector3Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y, 0)))) // check if enemy in path then stop horizontal in this position
+							if (Spawner.instance.EnemiesInBoard.ContainsKey(new Vector3Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y, 0))) // check if enemy in path then stop horizontal in this position
+							{ 
+								AvialiblePosition.Add(new Vector2Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y));
 								break;
+							}
+							
+							AvialiblePosition.Add(new Vector2Int(StartPosition.x + (IsLeft == 0 ? -i : i), StartPosition.y));
 						}
 					}
 					for (int i = 1; i <= Mathf.Max(StartBoardPos.y, EndBoardPos.y) - Mathf.Min(StartBoardPos.y, EndBoardPos.y); i++) // create vertical
 					{
-						AvialiblePosition.Add(new Vector2Int(StartPosition.x, StartPosition.y + i));
-						if (IsEnemyTile(BoardTileMap.GetTile(new Vector3Int(StartPosition.x, StartPosition.y + i, 0)))) // check if enemy in path then stop vertical in this position
+						if (Spawner.instance.EnemiesInBoard.ContainsKey(new Vector3Int(StartPosition.x, StartPosition.y + i, 0))) // check if enemy in path then stop vertical in this position
+						{
+							AvialiblePosition.Add(new Vector2Int(StartPosition.x, StartPosition.y + i));
 							break;
+						}
+						AvialiblePosition.Add(new Vector2Int(StartPosition.x, StartPosition.y + i));
 					}
 				}
 				break;
